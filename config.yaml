@@ -88,10 +88,10 @@ params:
         subtitle: What I have done so far
         title: My CV
         url: blogs/cv
-      - image: pic03.jpg
-        subtitle: Lorem Etiam Nullam
-        title: Magna
-        url: blogs/magna
+      - image: Banks.jpg
+        subtitle: The dollar system
+        title: Non-US banks' dollar funding maturity mismatch
+        url: blogs/banks_article
       - image: pic04.jpg
         subtitle: Nisl Sed Aliquam
         title: Ipsum
