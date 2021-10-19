@@ -87,7 +87,7 @@ params:
       - image: CV.jpg
         subtitle: What I have done so far
         title: My CV
-        url: blogs/risk_return
+        url: blogs/CV
       - image: pic03.jpg
         subtitle: Lorem Etiam Nullam
         title: Magna
