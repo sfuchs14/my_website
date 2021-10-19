@@ -24,7 +24,7 @@ params:
         title: Email
     enable: yes
     phone:
-      - phone: 0447883115032
+      - phone: "(44)07883115032"
         title: Phone
   custom_css: []
   custom_js: []
@@ -84,9 +84,9 @@ params:
         subtitle: United States - deeply divided 
         title: R Data Visualisation
         url: blogs/aliquam
-      - image: pic02.jpg
-        subtitle: Feugiat Amet Tempus
-        title: Risk Return of DJIA
+      - image: CV.jpg
+        subtitle: What I have done so far
+        title: My CV
         url: blogs/risk_return
       - image: pic03.jpg
         subtitle: Lorem Etiam Nullam
