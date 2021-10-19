@@ -9,7 +9,7 @@ image: Banks.jpg # save picture in \static\img\blogs. Acceptable formats= jpg, j
 
 keywords: ""
 slug: banks_article # slug is the shorthand URL address... no spaces plz
-title: Non-US banks' dollar maturity mismatch
+title: The global US dollar system
 ---
   
 
@@ -33,6 +33,7 @@ Regulatory changes, stricter capital requirements, and asymmetries in demand and
 
 The fragility of non-US banks’ dollar funding activities outlined above makes it more difficult to obtain dollar funding during periods of distress in the financial markets. Resulting dollar shortages due to restricted willingness to lend have significantly contributed to the appreciation of the US dollar against most other currencies. The Broad Trade Weighted US Dollar Index as well as the Emerging Markets Economies Trade Weighted US Dollar Index have been following an upward trajectory since September 2008. Especially in the months after the collapse of Lehman Brothers and the beginning of the COVID-19 crisis, abrupt increases in the exchange value can be noticed. Other factors also contribute to the appreciation of the dollar during such periods. One of the most important is the dollar’s safe haven currency status in times of distress
 
-```{r}
-knitr::include_graphics("/img/Dollar.jpg",error =FALSE)
+### Appreciation of the US dollar
+```{r echo=FALSE}
+knitr::include_graphics("/img/Dollar.png",error =FALSE)
 ```
