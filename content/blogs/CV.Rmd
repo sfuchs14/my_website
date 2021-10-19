@@ -8,7 +8,7 @@ draft: false
 image: CV.jpg # save picture in \static\img\blogs. Acceptable formats= jpg, jpeg, or png . Your iPhone pics wont work
 
 keywords: ""
-slug: CV # slug is the shorthand URL address... no spaces plz
+slug: cv # slug is the shorthand URL address... no spaces plz
 title: My CV
 ---
   
@@ -26,7 +26,7 @@ This past spring, I did a M&A internship at Clearwater International in Frankfur
 
 ## Extracurricular Activites
 
-After the third semester of my bachelor's degree, I joined Austria's biggest student consultancy. This was definitely one of my best decisions I have ever made, as I have never learned more in such a short period of time. After one semester, I took on the responsibility of leading the sales team. Furthermore, I also joined the Equity Research division of my university's finance association WUTIS - Trading and Investment Society. There I gained important knowledge about corporate finance and valuation. Moreover, I discovered my passion for macroeconomics at WUTIS. This has led me to launch my own website [The Macro Project](www.themacroproject.uk) on which I publish articles on different macroeconomic topics.
+After the third semester of my bachelor's degree, I joined Austria's biggest student consultancy. This was definitely one of my best decisions I have ever made, as I have never learned more in such a short period of time. After one semester, I took on the responsibility of leading the sales team. Furthermore, I also joined the Equity Research division of my university's finance association WUTIS - Trading and Investment Society. There I gained important knowledge about corporate finance and valuation. Moreover, I discovered my passion for macroeconomics at WUTIS. This has led me to launch my own website The Macro Project on which I publish articles on different macroeconomic topics.
 
 ## Interests
 

@@ -3,111 +3,101 @@ categories:
 - ""    #the front matter should be like the one found in, e.g., blog2.md. It cannot be like the normal Rmd we used
 - ""
 date: "2021-09-30"
-description: Risk-Return of DJIA stocks # the title that will show up once someone gets to this page
+description: German election polls over time  # the title that will show up once someone gets to this page
 draft: false
-image: spices.jpg # save picture in \static\img\blogs. Acceptable formats= jpg, jpeg, or png . Your iPhone pics wont work
+image:  # save picture in \static\img\blogs. Acceptable formats= jpg, jpeg, or png . Your iPhone pics wont work
 
 keywords: ""
-slug: risk_return # slug is the shorthand URL address... no spaces plz
-title: Risk-Return of DJIA stocks
+slug: german_polls # slug is the shorthand URL address... no spaces plz
+title: The German election polls
 ---
 
 <script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
 
 
-<div id="returns-of-financial-stocks" class="section level1">
-<h1>Returns of financial stocks</h1>
-<p>Next, let’s choose the <a href="https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average">Dow Jones Industrial Average (DJIA)</a> stocks and their ticker symbols and download some data. Besides the thirty stocks that make up the DJIA, we will also add <code>SPY</code> which is an SP500 ETF (Exchange Traded Fund).</p>
-<p>We will use the <code>rvest</code> package to scrape the Wikipedia page for the constituents of DJIA</p>
-<pre class="r"><code>djia_url &lt;- &quot;https://en.wikipedia.org/wiki/Dow_Jones_Industrial_Average&quot;
+<pre class="r"><code>url &lt;- &quot;https://en.wikipedia.org/wiki/Opinion_polling_for_the_2021_German_federal_election&quot;
+
+# similar graphs and analyses can be found at 
+# https://www.theguardian.com/world/2021/jun/21/german-election-poll-tracker-who-will-be-the-next-chancellor
+# https://www.economist.com/graphic-detail/who-will-succeed-angela-merkel
 
 
-#get tables that exist on URL
-tables &lt;- djia_url %&gt;% 
+# get tables that exist on wikipedia page 
+tables &lt;- url %&gt;% 
   read_html() %&gt;% 
   html_nodes(css=&quot;table&quot;)
 
 
-# parse HTML tables into a dataframe called djia. 
+# parse HTML tables into a dataframe called polls 
 # Use purr::map() to create a list of all tables in URL
-djia &lt;- map(tables, . %&gt;% 
-               html_table(fill=TRUE)%&gt;% 
-               clean_names())
+polls &lt;- map(tables, . %&gt;% 
+             html_table(fill=TRUE)%&gt;% 
+             janitor::clean_names())
 
 
-# constituents
-table1 &lt;- djia[[2]] %&gt;% # the second table on the page contains the ticker symbols
-  mutate(date_added = ymd(date_added),
+# list of opinion polls
+german_election_polls &lt;- polls[[1]] %&gt;% # the first table on the page contains the list of all opinions polls
+  slice(2:(n()-1)) %&gt;%  # drop the first row, as it contains again the variable names and last row that contains 2017 results
+  mutate(
+         # polls are shown to run from-to, e.g. 9-13 Aug 2021. We keep the last date, 13 Aug here, as the poll date
+         # and we extract it by picking the last 11 characters from that field
+         end_date = str_sub(fieldwork_date, -11),
          
-         # if a stock is listed on NYSE, its symbol is, e.g., NYSE: MMM
-         # We will get prices from yahoo finance which requires just the ticker
+         # end_date is still a string, so we convert it into a date object using lubridate::dmy()
+         end_date = dmy(end_date),
          
-         # if symbol contains &quot;NYSE*&quot;, the * being a wildcard
-         # then we jsut drop the first 6 characters in that string
-         ticker = ifelse(str_detect(symbol, &quot;NYSE*&quot;),
-                          str_sub(symbol,7,11),
-                          symbol)
+         # we also get the month and week number from the date, if we want to do analysis by month- week, etc.
+         month = month(end_date),
+         week = isoweek(end_date)
          )
 
-# we need a vector of strings with just the 30 tickers + SPY  + VIX
-tickers &lt;- table1 %&gt;% 
-  select(ticker) %&gt;% 
-  pull() %&gt;% # pull() gets them as a sting of characters
-  c(&quot;SPY&quot;, &quot;^VIX&quot;) # and lets us add SPY, the SP500 ETF, and the VIX index</code></pre>
-<pre class="r"><code># Notice the cache=TRUE argument in the chunk options. Because getting data is time consuming, # cache=TRUE means that once it downloads data, the chunk will not run again next time you knit your Rmd
+german_election_polls0&lt;-german_election_polls
+german_election_polls&lt;- german_election_polls %&gt;% 
+  arrange(end_date) %&gt;% 
+  group_by(end_date) %&gt;% 
+  summarise(CDU_m=mean(union),spd_m=mean(spd),afd_m=mean(af_d),fdp_m=mean(fdp),linke_m=mean(linke),grune_m=mean(grune))
+  
 
-myStocks &lt;- tickers %&gt;% 
-  tq_get(get  = &quot;stock.prices&quot;,
-         from = &quot;2000-01-01&quot;) %&gt;%
-  group_by(symbol) 
+election_rolling_mean &lt;- german_election_polls %&gt;%   # this is a new object
+  mutate( 
+    #calculate 3-day rolling average
+    CDU=zoo::rollmean(CDU_m, k=14, fill = NA),
+    afd=zoo::rollmean(afd_m, k=14, fill = NA),
+    spd = zoo::rollmean(spd_m, k=14, fill = NA),
+    fdp = zoo::rollmean(fdp_m, k=14, fill = NA),
+    linke= zoo::rollmean(linke_m, k=14, fill = NA),
+    grune = zoo::rollmean(grune_m, k=14, fill = NA)
+    ) 
 
-glimpse(myStocks) # examine the structure of the resulting data frame</code></pre>
-<pre><code>## Rows: 167,471
-## Columns: 8
-## Groups: symbol [32]
-## $ symbol   &lt;chr&gt; &quot;MMM&quot;, &quot;MMM&quot;, &quot;MMM&quot;, &quot;MMM&quot;, &quot;MMM&quot;, &quot;MMM&quot;, &quot;MMM&quot;, &quot;MMM&quot;, &quot;MMM&quot;~
-## $ date     &lt;date&gt; 2000-01-03, 2000-01-04, 2000-01-05, 2000-01-06, 2000-01-07, ~
-## $ open     &lt;dbl&gt; 48.0, 46.4, 45.6, 47.2, 50.6, 50.2, 50.4, 51.0, 50.7, 50.4, 4~
-## $ high     &lt;dbl&gt; 48.2, 47.4, 48.1, 51.2, 51.9, 51.8, 51.2, 51.8, 50.9, 50.5, 4~
-## $ low      &lt;dbl&gt; 47.0, 45.3, 45.6, 47.2, 50.0, 50.0, 50.2, 50.4, 50.2, 49.5, 4~
-## $ close    &lt;dbl&gt; 47.2, 45.3, 46.6, 50.4, 51.4, 51.1, 50.2, 50.4, 50.4, 49.7, 4~
-## $ volume   &lt;dbl&gt; 2173400, 2713800, 3699400, 5975800, 4101200, 3863800, 2357600~
-## $ adjusted &lt;dbl&gt; 27.2, 26.1, 26.9, 29.0, 29.6, 29.4, 28.9, 29.0, 29.0, 28.6, 2~</code></pre>
-<p>Financial performance analysis depend on returns; If I buy a stock today for 100 and I sell it tomorrow for 101.75, my one-day return, assuming no transaction costs, is 1.75%. So given the adjusted closing prices, our first step is to calculate daily and monthly returns.</p>
-<pre class="r"><code>#calculate daily returns
-myStocks_returns_daily &lt;- myStocks %&gt;%
-  tq_transmute(select     = adjusted, 
-               mutate_fun = periodReturn, 
-               period     = &quot;daily&quot;, 
-               type       = &quot;log&quot;,
-               col_rename = &quot;daily_returns&quot;,
-               cols = c(nested.col))  
+election_rolling_mean&lt;-na.omit(election_rolling_mean)
+election_rolling&lt;-data.frame(x=unlist(election_rolling_mean[,8:13]))
+election_rolling[,2]&lt;-rep(c(&quot;CDU&quot;,&quot;afd&quot;,&quot;spd&quot;,&quot;fdp&quot;,&quot;linke&quot;,&quot;grune&quot;),each=nrow(election_rolling_mean))
+election_rolling[,3]&lt;-rep(election_rolling_mean$end_date,6)
+names(election_rolling)[2]&lt;-&quot;Parties&quot;
 
-#calculate monthly  returns
-myStocks_returns_monthly &lt;- myStocks %&gt;%
-  tq_transmute(select     = adjusted, 
-               mutate_fun = periodReturn, 
-               period     = &quot;monthly&quot;, 
-               type       = &quot;arithmetic&quot;,
-               col_rename = &quot;monthly_returns&quot;,
-               cols = c(nested.col)) </code></pre>
-<pre class="r"><code>#visualise monthly returns since 2010, for each of the 30 DJIA stocks
-myStocks_returns_monthly %&gt;% 
-  filter(symbol != &quot;^VIX&quot;, symbol != &quot;SPY&quot;) %&gt;% 
-  filter(date &gt;= &quot;2010-01-01&quot;) %&gt;% 
-  ggplot(aes(x = monthly_returns)) +
-  geom_density(aes(colour = symbol), alpha = 1) +
-  geom_histogram(aes(fill = symbol), alpha = 0.4, binwidth = 0.005)+
-  facet_wrap(~symbol, nrow=7)+
-  theme_bw(8)+
-  theme(legend.position = &quot;none&quot;) +
-  scale_x_continuous(labels = scales::percent) +
-  labs(
-    title = &quot;Distribution of monthly returns for DJIA stocks&quot;,
-    subtitle = &quot;Jan 2010 - now&quot;,
-    x = &quot;Monthly returns (%)&quot;,
-    y = &quot;&quot; )+
-  NULL</code></pre>
-<p><img src="/blogs/US_elections_files/figure-html/unnamed-chunk-1-1.png" width="648" style="display: block; margin: auto;" /></p>
-<p><img src="/blogs/US_elections_files/figure-html/risk_return-1.png" width="648" style="display: block; margin: auto;" /></p>
+p&lt;-data.frame(x=unlist(german_election_polls0[,5:10]))
+p[,2]&lt;-rep(c(&quot;CDU&quot;,&quot;spd&quot;,&quot;afd&quot;,&quot;fdp&quot;,&quot;linke&quot;,&quot;grune&quot;),each=nrow(german_election_polls0))
+p[,3]&lt;-rep(c(german_election_polls0$end_date),6)
+
+
+ggplot() +
+  geom_line(data=election_rolling, aes(x=V3,y=x,colour=Parties)) +
+  ylim(0, 50)+
+  geom_point(data=p,aes(y=x,x=V3,colour=V2),alpha=0.5,size=1)+
+  scale_x_date(date_labels = &quot;%d/%b/%Y&quot;)+
+  theme_bw()+
+    theme(legend.position = &quot;none&quot;)+
+    labs(
+    title = &quot;German Election Poll vs. Time&quot;,
+    x = &quot;date&quot;,
+    y = &quot;14-day rolling average %&quot;,
+    )+
+  theme(plot.title = element_text(size=18),plot.subtitle = element_text(size=16),axis.title.x =element_text(size = 14),axis.title.y = element_text(size = 14))+
+  scale_color_manual(values = c(&quot;blue&quot;,&quot;black&quot; , &quot;yellow&quot;,&quot;green&quot;,&quot;purple&quot;,&quot;red&quot;))+
+  theme(legend.position=&quot;right&quot;)+
+    NULL</code></pre>
+<p><img src="/blogs/US_elections_files/figure-html/scrape_wikipedia_polling_data-1.png" width="768" style="display: block; margin: auto;" /></p>
+<div id="opinion" class="section level2">
+<h2>Opinion</h2>
+<p>Here you can see the development of the German election polls over time as well as a 14-day rolling average. Some interesting shifts in the support for the CDU can be observed. Armin Laschet, frontrunner of the CDU, was made responsible for this, as he could not convince voters in public discussions. Most of the prior CDU voters shifted to SPD and their frontrunner Olaf Scholz.</p>
 </div>
