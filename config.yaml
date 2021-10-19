@@ -8,7 +8,7 @@ params:
   banner:
     buttonText: Go to my projects
     subtitle: |-
-      Here you can find everything about my R projects, my CV, and also the macroeconomics articles I wrote
+      Here you can find everything about my R projects, career, and the articles I wrote on different economic phenomena
     title: Welcome to Samuel's website
   blog: {}
   contact:
@@ -80,9 +80,9 @@ params:
   tiles:
     enable: yes
     showcase:
-      - image: lbs.jpg
-        subtitle: Ipsum Dolor Sit Amet
-        title: Aliquam
+      - image: USflag.jpg
+        subtitle: United States - deeply divided 
+        title: R Data Visualisation
         url: blogs/aliquam
       - image: pic02.jpg
         subtitle: Feugiat Amet Tempus
