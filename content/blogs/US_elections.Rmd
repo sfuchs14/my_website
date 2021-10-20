@@ -5,7 +5,7 @@ categories:
 date: "2021-09-30"
 description: German election polls over time  # the title that will show up once someone gets to this page
 draft: false
-image:  # save picture in \static\img\blogs. Acceptable formats= jpg, jpeg, or png . Your iPhone pics wont work
+#image:  # save picture in \static\img\blogs. Acceptable formats= jpg, jpeg, or png . Your iPhone pics wont work
 
 keywords: ""
 slug: german_polls # slug is the shorthand URL address... no spaces plz
@@ -100,7 +100,7 @@ german_election_polls<- german_election_polls %>%
 ```  
 
 
-## Rolling mean calculation and visualisation
+## Rolling average calculation and visualisation
 
 ```{r, scrape_wikipedia_polling_dat, warnings= FALSE, message=FALSE}
 election_rolling_mean <- german_election_polls %>%   # this is a new object
