@@ -49,7 +49,7 @@ library(kableExtra)
 
 
 
-
+## Getting the data
 
 ```{r, scrape_wikipedia_polling_data, warnings= FALSE, message=FALSE}
 url <- "https://en.wikipedia.org/wiki/Opinion_polling_for_the_2021_German_federal_election"
@@ -70,8 +70,12 @@ tables <- url %>%
 polls <- map(tables, . %>% 
              html_table(fill=TRUE)%>% 
              janitor::clean_names())
+```
 
 
+## Data Preparation
+
+```{r, scrape_wikipedia_polling_dat, warnings= FALSE, message=FALSE}
 # list of opinion polls
 german_election_polls <- polls[[1]] %>% # the first table on the page contains the list of all opinions polls
   slice(2:(n()-1)) %>%  # drop the first row, as it contains again the variable names and last row that contains 2017 results
@@ -93,8 +97,12 @@ german_election_polls<- german_election_polls %>%
   arrange(end_date) %>% 
   group_by(end_date) %>% 
   summarise(CDU_m=mean(union),spd_m=mean(spd),afd_m=mean(af_d),fdp_m=mean(fdp),linke_m=mean(linke),grune_m=mean(grune))
-  
+```  
 
+
+## Rolling mean calculation and visualisation
+
+```{r, scrape_wikipedia_polling_dat, warnings= FALSE, message=FALSE}
 election_rolling_mean <- german_election_polls %>%   # this is a new object
   mutate( 
     #calculate 3-day rolling average
