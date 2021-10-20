@@ -74,7 +74,7 @@ params:
        # url: blogs/ipsum
       #- name: Elements
        # url: elements.html
-    menu: Menu
+    #menu: Menu
     subtitle: Fuchs
     title: Samuel
   tiles:
